@@ -1,0 +1,2 @@
+NodeName=node01 CPUs=16 Boards=1 SocketsPerBoard=1 CoresPerSocket=8 ThreadsPerCore=2 RealMemory=64000
+UpTime=0-01:02:03
