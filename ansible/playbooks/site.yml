@@ -1,0 +1,17 @@
+---
+- name: Base comum
+  ansible.builtin.import_playbook: common.yml
+- name: Usuários
+  ansible.builtin.import_playbook: users.yml
+- name: Armazenamento NFS
+  ansible.builtin.import_playbook: storage.yml
+- name: Munge
+  ansible.builtin.import_playbook: munge.yml
+- name: Driver NVIDIA e CUDA
+  ansible.builtin.import_playbook: nvidia.yml
+- name: OpenMPI
+  ansible.builtin.import_playbook: openmpi.yml
+- name: Banco e slurmdbd
+  ansible.builtin.import_playbook: accounting.yml
+- name: Slurm
+  ansible.builtin.import_playbook: slurm.yml

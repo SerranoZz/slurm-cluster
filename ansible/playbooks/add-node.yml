@@ -1,0 +1,19 @@
+---
+# Uso: ansible-playbook playbooks/add-node.yml -e node=node03
+# Pré-requisito: node no inventário e ansible/host_vars/<node>.yml gerado por scripts/discover.py
+- name: Preparar o nó novo
+  hosts: "{{ node | default('nenhum') }}"
+  vars_files:
+    - ["../group_vars/users.yml", "../group_vars/users.example.yml"]
+  roles:
+    - common
+    - users
+    - nfs_client
+    - munge
+    - nvidia
+    - openmpi
+
+- name: Atualizar configuração do Slurm no headnode e subir o nó
+  hosts: "headnode:{{ node | default('nenhum') }}"
+  roles:
+    - slurm
