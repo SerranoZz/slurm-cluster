@@ -1,0 +1,4 @@
+# Copie para ansible/group_vars/users.yml (ignorado pelo git? não: não contém segredos) e edite.
+cluster_users:
+  - {name: alice, uid: 1001, gid: 1001}
+  - {name: bob, uid: 1002, gid: 1002}

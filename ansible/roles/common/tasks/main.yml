@@ -1,0 +1,22 @@
+---
+- name: Instalar pacotes base
+  ansible.builtin.apt:
+    name: [build-essential, nfs-common, python3, chrony]
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Garantir chrony ativo
+  ansible.builtin.service:
+    name: chrony
+    state: started
+    enabled: true
+
+- name: Gerar entradas do cluster em /etc/hosts
+  ansible.builtin.blockinfile:
+    path: /etc/hosts
+    marker: "# {mark} ANSIBLE slurm-cluster"
+    block: |
+      {% for h in groups['all'] %}
+      {{ hostvars[h].ansible_host }} {{ h }}
+      {% endfor %}

@@ -1,5 +1,5 @@
 cluster_name: lab-cluster
-headnode_hostname: headnode
+headnode_hostname: head01
 lab_user: lab-hpc
 lab_uid: 1000
 lab_gid: 1000

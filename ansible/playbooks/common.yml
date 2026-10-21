@@ -1,0 +1,5 @@
+---
+- name: Base comum do cluster
+  hosts: all
+  roles:
+    - common

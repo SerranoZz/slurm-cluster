@@ -8,3 +8,4 @@ ansible/host_vars/*.yml
 secrets/*
 !secrets/*.example.yml
 *.vault
+ansible/group_vars/users.yml
