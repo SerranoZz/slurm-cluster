@@ -1,0 +1,32 @@
+# Gerado pelo Ansible — não edite à mão
+ClusterName={{ cluster_name }}
+SlurmctldHost={{ headnode_hostname }}
+AuthType=auth/munge
+MpiDefault=pmix
+ProctrackType=proctrack/cgroup
+TaskPlugin=task/cgroup,task/affinity
+SelectType=select/cons_tres
+SelectTypeParameters=CR_Core_Memory
+SchedulerType=sched/backfill
+SlurmUser=slurm
+StateSaveLocation=/var/spool/slurmctld
+SlurmdSpoolDir=/var/spool/slurmd
+SlurmctldLogFile=/var/log/slurm/slurmctld.log
+SlurmdLogFile=/var/log/slurm/slurmd.log
+GresTypes=gpu
+AccountingStorageType=accounting_storage/slurmdbd
+AccountingStorageHost={{ headnode_hostname }}
+AccountingStorageTRES=gres/gpu
+JobAcctGatherType=jobacct_gather/cgroup
+{% for n in groups['compute'] %}
+{% set h = hostvars[n] %}
+NodeName={{ n }} CPUs={{ h.cpus }} Sockets={{ h.sockets }} CoresPerSocket={{ h.cores_per_socket }} ThreadsPerCore={{ h.threads_per_core }} RealMemory={{ h.real_memory_mb }}{% if h.gpu_supported %} Gres={% for t, items in h.gpus | groupby('type') %}gpu:{{ t }}:{{ items | length }}{{ ',' if not loop.last }}{% endfor %}{% endif %} State=UNKNOWN
+{% endfor %}
+PartitionName=cpu Nodes={{ groups['compute'] | join(',') }} Default=YES MaxTime=INFINITE State=UP
+{% set gpu_nodes = [] %}
+{% for n in groups['compute'] if hostvars[n].gpu_supported %}
+{% set _ = gpu_nodes.append(n) %}
+{% endfor %}
+{% if gpu_nodes %}
+PartitionName=gpu Nodes={{ gpu_nodes | join(',') }} MaxTime=INFINITE State=UP
+{% endif %}

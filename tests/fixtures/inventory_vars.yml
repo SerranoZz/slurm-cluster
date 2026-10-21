@@ -1,0 +1,26 @@
+cluster_name: lab-cluster
+headnode_hostname: head01
+groups:
+  headnode: [head01]
+  compute: [node01, node02, node03]
+hostvars:
+  head01: {}
+  node01: &base
+    cpus: 16
+    sockets: 1
+    cores_per_socket: 8
+    threads_per_core: 2
+    real_memory_mb: 64000
+    gpu_supported: true
+    gpus:
+      - {model: NVIDIA GeForce RTX 3090, type: rtx_3090, compute_cap: 8.6}
+      - {model: NVIDIA GeForce RTX 3090, type: rtx_3090, compute_cap: 8.6}
+  node02:
+    <<: *base
+    gpu_supported: false
+    gpus: []
+  node03:
+    <<: *base
+    gpu_supported: false
+    gpus:
+      - {model: NVIDIA GeForce GTX 970, type: gtx_970, compute_cap: 5.2}
