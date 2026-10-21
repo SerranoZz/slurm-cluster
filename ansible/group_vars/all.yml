@@ -1,0 +1,12 @@
+cluster_name: lab-cluster
+headnode_hostname: headnode
+lab_user: lab-hpc
+lab_uid: 1000
+lab_gid: 1000
+nfs_subnet: 192.168.0.0/24
+# package: usa o Slurm do Ubuntu; build: compila (PMIx + NVML)
+slurm_install_method: package
+# Compute capability mínima aceita pelo driver escolhido
+nvidia_min_compute_cap: 6.0
+nvidia_driver_version: "580"
+cuda_version: "13-0"

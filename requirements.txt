@@ -1,0 +1,6 @@
+ansible-core
+ansible-lint
+yamllint
+pytest
+jinja2
+pyyaml

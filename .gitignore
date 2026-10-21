@@ -1,0 +1,10 @@
+.venv/
+.superpowers/
+__pycache__/
+.pytest_cache/
+ansible/inventory/
+ansible/host_vars/*.yml
+!ansible/host_vars/*.example.yml
+secrets/*
+!secrets/*.example.yml
+*.vault
