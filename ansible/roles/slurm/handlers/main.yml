@@ -1,0 +1,5 @@
+---
+- name: Reiniciar serviços do Slurm
+  ansible.builtin.service:
+    name: "{{ 'slurmctld' if inventory_hostname in groups['headnode'] else 'slurmd' }}"
+    state: restarted

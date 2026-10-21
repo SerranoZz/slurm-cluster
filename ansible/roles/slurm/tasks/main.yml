@@ -1,0 +1,52 @@
+---
+- name: Compilar Slurm (PMIx + NVML) quando solicitado
+  ansible.builtin.include_role:
+    name: slurm_build
+  when: slurm_install_method == 'build'
+
+- name: Instalar pacotes do Slurm do Ubuntu
+  ansible.builtin.apt:
+    name: "{{ ['slurmctld', 'slurm-client'] if inventory_hostname in groups['headnode'] else ['slurmd', 'slurm-client'] }}"
+    state: present
+  when: slurm_install_method == 'package'
+
+- name: Criar diretórios de spool e log
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: slurm
+    group: slurm
+    mode: "0755"
+  loop: [/var/spool/slurmctld, /var/spool/slurmd, /var/log/slurm, /etc/slurm]
+
+- name: Gerar configuração do Slurm
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "/etc/slurm/{{ item }}"
+    owner: slurm
+    group: slurm
+    mode: "0644"
+  loop: [slurm.conf, gres.conf, cgroup.conf]
+  notify: Reiniciar serviços do Slurm
+
+- name: Checar suporte a PMIx no Slurm instalado
+  ansible.builtin.shell: set -o pipefail && srun --mpi=list 2>&1 | grep -qi pmix
+  args:
+    executable: /bin/bash
+  changed_when: false
+  failed_when: slurm_pmix_check.rc != 0
+  register: slurm_pmix_check
+
+- name: Garantir slurmctld ativo (headnode)
+  ansible.builtin.service:
+    name: slurmctld
+    state: started
+    enabled: true
+  when: inventory_hostname in groups['headnode']
+
+- name: Garantir slurmd ativo (nós de computação)
+  ansible.builtin.service:
+    name: slurmd
+    state: started
+    enabled: true
+  when: inventory_hostname in groups['compute']

@@ -1,0 +1,5 @@
+---
+- name: Slurm no headnode e nos nós
+  hosts: all
+  roles:
+    - slurm

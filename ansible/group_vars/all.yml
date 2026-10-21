@@ -10,3 +10,5 @@ slurm_install_method: package
 nvidia_min_compute_cap: 6.0
 nvidia_driver_version: "580"
 cuda_version: "13-0"
+# Versão usada quando slurm_install_method: build
+slurm_build_version: "25.05.3"

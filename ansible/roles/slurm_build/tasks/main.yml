@@ -1,0 +1,22 @@
+---
+# Fallback: use quando o pacote do Ubuntu não tiver PMIx ou NVML.
+# Defina slurm_install_method: build em group_vars/all.yml.
+- name: Instalar dependências de compilação
+  ansible.builtin.apt:
+    name: [build-essential, libmunge-dev, libpmix-dev, libhwloc-dev, libdbus-1-dev, libmariadb-dev, libnvidia-ml-dev, wget]
+    state: present
+
+- name: Baixar fonte do Slurm
+  ansible.builtin.unarchive:
+    src: "https://download.schedmd.com/slurm/slurm-{{ slurm_build_version }}.tar.bz2"
+    dest: /usr/local/src
+    remote_src: true
+    creates: "/usr/local/src/slurm-{{ slurm_build_version }}"
+
+- name: Compilar e instalar
+  ansible.builtin.shell: >-
+    ./configure --prefix=/usr/local --sysconfdir=/etc/slurm --with-pmix --with-nvml &&
+    make -j"$(nproc)" && make install
+  args:
+    chdir: "/usr/local/src/slurm-{{ slurm_build_version }}"
+    creates: /usr/local/sbin/slurmd
