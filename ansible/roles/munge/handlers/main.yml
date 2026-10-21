@@ -1,0 +1,5 @@
+---
+- name: Reiniciar munge
+  ansible.builtin.service:
+    name: munge
+    state: restarted

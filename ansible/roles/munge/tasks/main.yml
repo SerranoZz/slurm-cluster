@@ -1,0 +1,36 @@
+---
+- name: Instalar munge
+  ansible.builtin.apt:
+    name: munge
+    state: present
+
+- name: Gerar chave munge no headnode (uma única vez)
+  ansible.builtin.command: /usr/sbin/mungekey --create
+  args:
+    creates: /etc/munge/munge.key
+  when: inventory_hostname in groups['headnode']
+  notify: Reiniciar munge
+
+- name: Ler chave do headnode
+  ansible.builtin.slurp:
+    src: /etc/munge/munge.key
+  register: munge_key_raw
+  delegate_to: "{{ groups['headnode'][0] }}"
+  run_once: true
+  no_log: true
+
+- name: Instalar a mesma chave em todos os hosts
+  ansible.builtin.copy:
+    content: "{{ munge_key_raw.content | b64decode }}"
+    dest: /etc/munge/munge.key
+    owner: munge
+    group: munge
+    mode: "0400"
+  no_log: true
+  notify: Reiniciar munge
+
+- name: Garantir munge ativo
+  ansible.builtin.service:
+    name: munge
+    state: started
+    enabled: true

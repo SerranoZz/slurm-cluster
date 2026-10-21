@@ -1,0 +1,5 @@
+---
+- name: Munge em todos os hosts
+  hosts: all
+  roles:
+    - munge
