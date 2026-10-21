@@ -8,7 +8,7 @@ O Slurm precisa saber CPUs, memória e GPUs de cada nó. O script descobre isso:
 
 ```bash
 scp ../scripts/discover.py lab-hpc@node01:/tmp/
-ssh lab-hpc@node01 'python3 /tmp/discover.py node01 --min-cap 6.0' > host_vars/node01.yml
+ssh lab-hpc@node01 'python3 /tmp/discover.py node01 --min-cap 7.5' > host_vars/node01.yml
 ```
 
 `gpu_supported: false` significa: sem GPU, ou GPU antiga demais. O nó fica só com CPU.
@@ -18,8 +18,8 @@ ssh lab-hpc@node01 'python3 /tmp/discover.py node01 --min-cap 6.0' > host_vars/n
 ## 2. Segredos e usuários
 
 ```bash
-cp ../secrets/slurmdbd.example.yml ../secrets/slurmdbd.yml   # troque a senha; fica fora do git
-cp group_vars/users.example.yml group_vars/users.yml         # lista de usuários do cluster
+cp ../secrets/slurmdbd.example.yml ../secrets/slurmdbd.yml   # troque a senha e apague a linha slurmdbd_example_placeholder; fica fora do git
+cp group_vars/users.example.yml group_vars/users.yml         # apague a linha users_example_placeholder e edite a lista
 ```
 
 Ajuste `lab_uid`, `lab_gid` e `nfs_subnet` em `group_vars/all.yml`.

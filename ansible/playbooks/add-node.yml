@@ -13,7 +13,12 @@
     - nvidia
     - openmpi
 
-- name: Atualizar configuração do Slurm no headnode e subir o nó
-  hosts: "headnode:{{ node | default('nenhum') }}"
+- name: Atualizar /etc/hosts em todas as máquinas (o headnode precisa resolver o nó novo)
+  hosts: all
+  roles:
+    - common
+
+- name: Regenerar slurm.conf em todos e subir o nó
+  hosts: "headnode:compute"
   roles:
     - slurm

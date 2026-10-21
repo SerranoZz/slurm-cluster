@@ -1,4 +1,5 @@
-# Copie para ansible/group_vars/users.yml (ignorado pelo git? não: não contém segredos) e edite.
+# Copie para ansible/group_vars/users.yml, apague a linha users_example_placeholder e edite.
+users_example_placeholder: true
 cluster_users:
   - {name: alice, uid: 1001, gid: 1001}
   - {name: bob, uid: 1002, gid: 1002}

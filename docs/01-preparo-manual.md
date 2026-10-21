@@ -34,6 +34,15 @@ ssh-keygen -t ed25519        # só na primeira vez
 ssh-copy-id lab-hpc@<IP-do-nó>
 ```
 
+Faça o mesmo **para o próprio headnode**, porque o Ansible também conecta nele por SSH:
+
+```bash
+ssh-copy-id lab-hpc@head01          # a partir do próprio head01
+echo 'lab-hpc ALL=(ALL) NOPASSWD:ALL' | sudo tee /etc/sudoers.d/lab-hpc && sudo chmod 440 /etc/sudoers.d/lab-hpc
+```
+
+Isso também evita perder o acesso quando o `/home` do headnode for montado nos nós por NFS: o `authorized_keys` passa a ser o do headnode.
+
 ## 5. Ansible no headnode
 
 ```bash

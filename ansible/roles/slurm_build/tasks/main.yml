@@ -1,10 +1,18 @@
 ---
 # Fallback: use quando o pacote do Ubuntu não tiver PMIx ou NVML.
 # Defina slurm_install_method: build em group_vars/all.yml.
+# Compila slurmctld, slurmd e slurmdbd da mesma versão (slurmdbd não pode ser mais antigo que o slurmctld).
 - name: Instalar dependências de compilação
   ansible.builtin.apt:
     name: [build-essential, libmunge-dev, libpmix-dev, libhwloc-dev, libdbus-1-dev, libmariadb-dev, libnvidia-ml-dev, wget]
     state: present
+
+- name: Criar usuário do sistema slurm
+  ansible.builtin.user:
+    name: slurm
+    system: true
+    shell: /usr/sbin/nologin
+    create_home: false
 
 - name: Baixar fonte do Slurm
   ansible.builtin.unarchive:
@@ -20,3 +28,12 @@
   args:
     chdir: "/usr/local/src/slurm-{{ slurm_build_version }}"
     creates: /usr/local/sbin/slurmd
+
+- name: Instalar units do systemd
+  ansible.builtin.copy:
+    src: "/usr/local/src/slurm-{{ slurm_build_version }}/etc/{{ item }}.service"
+    dest: "/etc/systemd/system/{{ item }}.service"
+    remote_src: true
+    mode: "0644"
+  loop: [slurmctld, slurmd, slurmdbd]
+  notify: Recarregar systemd

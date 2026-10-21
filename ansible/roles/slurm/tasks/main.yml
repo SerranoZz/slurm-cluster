@@ -37,6 +37,15 @@
   failed_when: slurm_pmix_check.rc != 0
   register: slurm_pmix_check
 
+- name: Checar plugin NVML do Slurm nos nós com GPU
+  ansible.builtin.find:
+    paths: [/usr/lib, /usr/local/lib]
+    patterns: gpu_nvml.so
+    recurse: true
+  register: slurm_nvml_check
+  failed_when: slurm_nvml_check.matched == 0
+  when: inventory_hostname in groups['compute'] and (gpu_supported | default(false))
+
 - name: Garantir slurmctld ativo (headnode)
   ansible.builtin.service:
     name: slurmctld

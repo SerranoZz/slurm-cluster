@@ -1,8 +1,23 @@
 ---
-- name: Instalar slurmdbd
+- name: Compilar Slurm quando solicitado (slurmdbd da mesma versão do slurmctld)
+  ansible.builtin.include_role:
+    name: slurm_build
+  when: slurm_install_method == 'build'
+
+- name: Instalar slurmdbd do Ubuntu
   ansible.builtin.apt:
     name: slurmdbd
     state: present
+  when: slurm_install_method == 'package'
+
+- name: Criar /etc/slurm e log
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: slurm
+    group: slurm
+    mode: "0755"
+  loop: [/etc/slurm, /var/log/slurm]
 
 - name: Gerar slurmdbd.conf (contém senha)
   ansible.builtin.template:

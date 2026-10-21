@@ -49,8 +49,10 @@ def test_accounting_slurmdbd_e_gres():
     assert "GresTypes=gpu" in conf
 
 
-def test_gres_conf_autodetect_nvml():
-    assert "AutoDetect=nvml" in render("gres.conf.j2")
+def test_gres_conf_nvml_so_em_no_com_gpu():
+    assert "AutoDetect=nvml" in render("gres.conf.j2", inventory_hostname="node01")
+    assert "AutoDetect=nvml" not in render("gres.conf.j2", inventory_hostname="node02")
+    assert "AutoDetect=off" in render("gres.conf.j2", inventory_hostname="node03")
 
 
 def test_sem_nos_com_gpu_nao_cria_particao_gpu():

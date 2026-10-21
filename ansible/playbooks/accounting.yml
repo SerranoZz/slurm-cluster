@@ -3,6 +3,11 @@
   hosts: headnode
   vars_files:
     - ["../../secrets/slurmdbd.yml", "../../secrets/slurmdbd.example.yml"]
+  pre_tasks:
+    - name: Abortar se a senha ainda é a do exemplo
+      ansible.builtin.assert:
+        that: not (slurmdbd_example_placeholder | default(false))
+        fail_msg: Crie secrets/slurmdbd.yml a partir de slurmdbd.example.yml com uma senha própria.
   roles:
     - mariadb
     - slurmdbd

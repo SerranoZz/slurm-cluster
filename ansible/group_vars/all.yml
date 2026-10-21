@@ -6,8 +6,8 @@ lab_gid: 1000
 nfs_subnet: 192.168.0.0/24
 # package: usa o Slurm do Ubuntu; build: compila (PMIx + NVML)
 slurm_install_method: package
-# Compute capability mínima aceita pelo driver escolhido
-nvidia_min_compute_cap: 6.0
+# Compute capability mínima aceita pelo CUDA escolhido (CUDA 13 exige >= 7.5)
+nvidia_min_compute_cap: 7.5
 nvidia_driver_version: "580"
 cuda_version: "13-0"
 # Versão usada quando slurm_install_method: build

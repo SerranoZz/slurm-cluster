@@ -1,4 +1,10 @@
 ---
+- name: Abortar se a lista de usuários ainda é o exemplo
+  ansible.builtin.assert:
+    that: not (users_example_placeholder | default(false))
+    fail_msg: Crie ansible/group_vars/users.yml a partir de users.example.yml.
+  run_once: true
+
 - name: Consultar contas existentes
   ansible.builtin.getent:
     database: passwd
@@ -12,6 +18,22 @@
       Usuário {{ item.name }} já existe em {{ inventory_hostname }} com UID
       {{ getent_passwd[item.name][1] | default('?') }}, esperado {{ item.uid }}.
       Corrija a conta manualmente antes de rodar o playbook.
+  loop: "{{ cluster_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Consultar grupos existentes
+  ansible.builtin.getent:
+    database: group
+  changed_when: false
+
+- name: Abortar se algum grupo existe com GID diferente
+  ansible.builtin.assert:
+    that:
+      - item.name not in getent_group or (getent_group[item.name][1] | int) == (item.gid | int)
+    fail_msg: >-
+      Grupo {{ item.name }} já existe em {{ inventory_hostname }} com GID
+      {{ getent_group[item.name][1] | default('?') }}, esperado {{ item.gid }}.
   loop: "{{ cluster_users }}"
   loop_control:
     label: "{{ item.name }}"

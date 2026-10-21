@@ -1,2 +1,6 @@
 # Gerado pelo Ansible
+{% if hostvars[inventory_hostname].gpu_supported | default(false) %}
 AutoDetect=nvml
+{% else %}
+AutoDetect=off
+{% endif %}

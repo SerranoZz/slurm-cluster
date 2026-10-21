@@ -11,22 +11,22 @@
   when: inventory_hostname in groups['headnode']
   notify: Reiniciar munge
 
-- name: Ler chave do headnode
-  ansible.builtin.slurp:
+- name: Trazer a chave do headnode para o controlador (binário, fora do git)
+  ansible.builtin.fetch:
     src: /etc/munge/munge.key
-  register: munge_key_raw
+    dest: "{{ playbook_dir }}/../../secrets/munge.key"
+    flat: true
   delegate_to: "{{ groups['headnode'][0] }}"
   run_once: true
-  no_log: true
+  become: true
 
 - name: Instalar a mesma chave em todos os hosts
   ansible.builtin.copy:
-    content: "{{ munge_key_raw.content | b64decode }}"
+    src: "{{ playbook_dir }}/../../secrets/munge.key"
     dest: /etc/munge/munge.key
     owner: munge
     group: munge
     mode: "0400"
-  no_log: true
   notify: Reiniciar munge
 
 - name: Garantir munge ativo
