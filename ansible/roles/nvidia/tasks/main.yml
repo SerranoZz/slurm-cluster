@@ -1,0 +1,36 @@
+---
+- name: Avisar nó sem GPU suportada
+  ansible.builtin.debug:
+    msg: >-
+      {{ inventory_hostname }}: sem GPU suportada pelo driver {{ nvidia_driver_version }}
+      (compute capability mínima {{ nvidia_min_compute_cap }}). Nó segue só com CPU.
+  when: not (gpu_supported | default(false))
+
+- name: Instalar driver e CUDA (apenas nós com GPU suportada)
+  when: gpu_supported | default(false)
+  block:
+    - name: Instalar ubuntu-drivers-common e gpg
+      ansible.builtin.apt:
+        name: [ubuntu-drivers-common, gnupg]
+        state: present
+
+    - name: Adicionar repositório CUDA da NVIDIA
+      ansible.builtin.apt:
+        deb: "{{ cuda_repo }}/cuda-keyring_1.1-1_all.deb"
+      vars:
+        ubuntu_tag: "ubuntu{{ ansible_distribution_version | replace('.', '') }}"
+        cuda_repo: "https://developer.download.nvidia.com/compute/cuda/repos/{{ ubuntu_tag }}/x86_64"
+      register: nvidia_cuda_keyring
+
+    - name: Instalar driver NVIDIA e toolkit CUDA
+      ansible.builtin.apt:
+        name:
+          - "nvidia-driver-{{ nvidia_driver_version }}"
+          - "cuda-toolkit-{{ cuda_version }}"
+        state: present
+        update_cache: "{{ nvidia_cuda_keyring.changed }}"
+      register: nvidia_install
+
+    - name: Reiniciar para carregar o driver
+      ansible.builtin.reboot:
+      when: nvidia_install.changed  # noqa: no-handler

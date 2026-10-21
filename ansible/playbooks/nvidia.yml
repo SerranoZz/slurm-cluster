@@ -1,0 +1,5 @@
+---
+- name: Driver NVIDIA e CUDA nos nós de computação
+  hosts: compute
+  roles:
+    - nvidia
