@@ -1,0 +1,8 @@
+---
+- name: Montar /home do headnode
+  ansible.posix.mount:
+    src: "{{ headnode_hostname }}:/home"
+    path: /home
+    fstype: nfs
+    opts: _netdev,rw,hard
+    state: mounted

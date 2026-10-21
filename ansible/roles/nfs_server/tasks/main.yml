@@ -1,0 +1,18 @@
+---
+- name: Instalar servidor NFS
+  ansible.builtin.apt:
+    name: nfs-kernel-server
+    state: present
+
+- name: Exportar /home para a sub-rede do cluster
+  ansible.builtin.lineinfile:
+    path: /etc/exports
+    line: "/home {{ nfs_subnet }}(rw,sync,no_subtree_check)"
+    regexp: '^/home\s'
+  notify: Reexportar NFS
+
+- name: Garantir NFS ativo
+  ansible.builtin.service:
+    name: nfs-kernel-server
+    state: started
+    enabled: true

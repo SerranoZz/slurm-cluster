@@ -1,0 +1,10 @@
+---
+- name: Servidor NFS no headnode
+  hosts: headnode
+  roles:
+    - nfs_server
+
+- name: Clientes NFS nos nós de computação
+  hosts: compute
+  roles:
+    - nfs_client
