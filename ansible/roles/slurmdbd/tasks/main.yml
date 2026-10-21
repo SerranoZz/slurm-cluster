@@ -1,0 +1,21 @@
+---
+- name: Instalar slurmdbd
+  ansible.builtin.apt:
+    name: slurmdbd
+    state: present
+
+- name: Gerar slurmdbd.conf (contém senha)
+  ansible.builtin.template:
+    src: slurmdbd.conf.j2
+    dest: /etc/slurm/slurmdbd.conf
+    owner: slurm
+    group: slurm
+    mode: "0600"
+  no_log: true
+  notify: Reiniciar slurmdbd
+
+- name: Garantir slurmdbd ativo
+  ansible.builtin.service:
+    name: slurmdbd
+    state: started
+    enabled: true

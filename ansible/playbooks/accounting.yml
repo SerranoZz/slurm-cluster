@@ -1,0 +1,8 @@
+---
+- name: Banco e slurmdbd no headnode
+  hosts: headnode
+  vars_files:
+    - ["../../secrets/slurmdbd.yml", "../../secrets/slurmdbd.example.yml"]
+  roles:
+    - mariadb
+    - slurmdbd

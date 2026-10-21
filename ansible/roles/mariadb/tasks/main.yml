@@ -1,0 +1,29 @@
+---
+- name: Instalar MariaDB e driver Python
+  ansible.builtin.apt:
+    name: [mariadb-server, python3-pymysql]
+    state: present
+
+- name: Garantir MariaDB ativo
+  ansible.builtin.service:
+    name: mariadb
+    state: started
+    enabled: true
+
+- name: Criar banco de accounting
+  ansible.mysql.mysql_db:
+    name: slurm_acct_db
+    login_unix_socket: /run/mysqld/mysqld.sock
+    state: present
+
+- name: Criar usuário do slurmdbd
+  ansible.mysql.mysql_user:
+    name: slurm
+    password: "{{ slurmdbd_db_password }}"
+    priv: "slurm_acct_db.*:ALL"
+    login_unix_socket: /run/mysqld/mysqld.sock
+    state: present
+  no_log: true
+
+- name: Configurar backup semanal do banco
+  ansible.builtin.import_tasks: backup.yml

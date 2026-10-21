@@ -1,0 +1,24 @@
+---
+- name: Criar diretório de backups
+  ansible.builtin.file:
+    path: /var/backups/slurm-db
+    state: directory
+    mode: "0700"
+
+- name: Script de backup com rotação de 4 cópias
+  ansible.builtin.copy:
+    dest: /usr/local/sbin/slurm-db-backup
+    mode: "0755"
+    content: |
+      #!/bin/sh
+      set -eu
+      mysqldump --single-transaction slurm_acct_db | gzip > /var/backups/slurm-db/slurm_acct_db-$(date +%F).sql.gz
+      ls -1t /var/backups/slurm-db/*.sql.gz | tail -n +5 | xargs -r rm --
+
+- name: Agendar backup semanal (domingo 03:00)
+  ansible.builtin.cron:
+    name: backup slurm_acct_db
+    weekday: "0"
+    hour: "3"
+    minute: "0"
+    job: /usr/local/sbin/slurm-db-backup
