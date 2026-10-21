@@ -1,0 +1,36 @@
+---
+- name: Consultar contas existentes
+  ansible.builtin.getent:
+    database: passwd
+  changed_when: false
+
+- name: Abortar se algum usuário existe com UID diferente
+  ansible.builtin.assert:
+    that:
+      - item.name not in getent_passwd or (getent_passwd[item.name][1] | int) == (item.uid | int)
+    fail_msg: >-
+      Usuário {{ item.name }} já existe em {{ inventory_hostname }} com UID
+      {{ getent_passwd[item.name][1] | default('?') }}, esperado {{ item.uid }}.
+      Corrija a conta manualmente antes de rodar o playbook.
+  loop: "{{ cluster_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Criar grupos
+  ansible.builtin.group:
+    name: "{{ item.name }}"
+    gid: "{{ item.gid }}"
+  loop: "{{ cluster_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Criar usuários (home só no headnode; nos nós vem via NFS)
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    uid: "{{ item.uid }}"
+    group: "{{ item.name }}"
+    shell: /bin/bash
+    create_home: "{{ inventory_hostname in groups['headnode'] }}"
+  loop: "{{ cluster_users }}"
+  loop_control:
+    label: "{{ item.name }}"

@@ -1,0 +1,7 @@
+---
+- name: Criar e propagar usuários com UID/GID idênticos
+  hosts: all
+  vars_files:
+    - ["../group_vars/users.yml", "../group_vars/users.example.yml"]
+  roles:
+    - users
