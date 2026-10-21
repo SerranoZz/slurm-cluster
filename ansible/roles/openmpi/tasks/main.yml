@@ -1,0 +1,13 @@
+---
+- name: Instalar OpenMPI
+  ansible.builtin.apt:
+    name: [openmpi-bin, libopenmpi-dev]
+    state: present
+
+- name: Verificar suporte a PMIx
+  ansible.builtin.shell: set -o pipefail && ompi_info | grep -i pmix
+  args:
+    executable: /bin/bash
+  register: openmpi_pmix
+  changed_when: false
+  failed_when: openmpi_pmix.rc != 0

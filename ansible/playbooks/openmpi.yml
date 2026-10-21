@@ -1,0 +1,5 @@
+---
+- name: OpenMPI com PMIx
+  hosts: all
+  roles:
+    - openmpi
